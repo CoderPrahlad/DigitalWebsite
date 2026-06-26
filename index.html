@@ -2529,7 +2529,10 @@
     <div class="modal-content">
       <span class="modal-close" onclick="closeModal('authModal')">×</span>
       <h2 class="modal-title" id="authTitle"><i class="fas fa-sign-in-alt"></i> Login</h2>
-      
+      <div style="text-align:center;margin:15px 0;color:#999;">— ya —</div>
+<button class="btn btn-full" onclick="googleLogin()" style="background:linear-gradient(135deg,#4285f4,#34a853);">
+  <i class="fab fa-google"></i> Google se Login karo
+</button>
       <div id="loginForm">
         <div class="input-group">
           <label><i class="fas fa-envelope"></i> Email</label>
@@ -2563,6 +2566,10 @@
         <button class="btn btn-full" onclick="signupUser()">
           <i class="fas fa-user-plus"></i> Create Account
         </button>
+        <div style="text-align:center;margin:15px 0;color:#999;">— ya —</div>
+<button class="btn btn-full" onclick="googleLogin()" style="background:linear-gradient(135deg,#4285f4,#34a853);">
+  <i class="fab fa-google"></i> Google se Signup karo
+</button>
         <p style="text-align: center; margin-top: 15px; color: #999;">
           Already have an account? <span style="color: #00ffff; cursor: pointer; font-weight: bold;" onclick="switchToLogin()">Login</span>
         </p>
@@ -2609,8 +2616,7 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-    import { getDatabase, ref, set, get, push, onValue, remove, update, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';    import { getDatabase, ref, set, get, push, onValue, remove, update, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
 
    const firebaseConfig = {
   apiKey: "AIzaSyBybXbMVsoPovDyKtOtfxE6DghVpSFTGHk",
@@ -2643,7 +2649,8 @@
     window.authSignIn = signInWithEmailAndPassword;
     window.authSignOut = signOut;
     window.authUpdateProfile = updateProfile;
-
+    window.GoogleAuthProvider = GoogleAuthProvider;
+    window.signInWithPopup = signInWithPopup;
     window.currentUser = null;
     window.allProducts = [];
     window.currentProduct = null;
@@ -4382,6 +4389,28 @@ Once payment is completed, the download link for your purchased digital item (HT
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('signupForm').style.display = 'block';
     }
+    async function googleLogin() {
+  try {
+    showLoading('Google se login ho raha hai...');
+    const provider = new window.GoogleAuthProvider();
+    const result = await window.signInWithPopup(window.auth, provider);
+    const user = result.user;
+    await window.dbSet(window.dbRef(window.db, `users/${user.uid}/profile`), {
+      name: user.displayName || 'User',
+      email: user.email,
+      createdAt: new Date().toISOString()
+    });
+    hideLoading();
+    closeModal('authModal');
+    showNotification(`Welcome, ${user.displayName}!`, 'success');
+  } catch (error) {
+    hideLoading();
+    if (error.code !== 'auth/popup-closed-by-user') {
+      showNotification('Google login failed: ' + error.message, 'error');
+    }
+  }
+}
+window.googleLogin = googleLogin;
 
     function switchToLogin() {
       document.getElementById('authTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
