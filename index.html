@@ -2529,7 +2529,7 @@
     <div class="modal-content">
       <span class="modal-close" onclick="closeModal('authModal')">×</span>
       <h2 class="modal-title" id="authTitle"><i class="fas fa-sign-in-alt"></i> Login</h2>
-     
+      
       <div id="loginForm">
         <div class="input-group">
           <label><i class="fas fa-envelope"></i> Email</label>
@@ -2542,6 +2542,15 @@
         <button class="btn btn-full" onclick="loginUser()">
           <i class="fas fa-sign-in-alt"></i> Login
         </button>
+        <div style="display:flex;align-items:center;gap:10px;margin:18px 0;">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
+          <span style="color:#999;font-size:13px;">ya</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
+        </div>
+        <button class="btn btn-full" onclick="googleLogin()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);color:#00ffff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" style="background:#fff;border-radius:50%;padding:2px;">
+          Continue with Google
+        </button>
         <p style="text-align: center; margin-top: 15px; color: #999;">
           Don't have an account? <span style="color: #00ffff; cursor: pointer; font-weight: bold;" onclick="switchToSignup()">Sign up</span>
         </p>
@@ -2551,6 +2560,10 @@
         <div class="input-group">
           <label><i class="fas fa-user"></i> Full Name</label>
           <input type="text" id="signupName" placeholder="Your name" autocomplete="name">
+        </div>
+        <div class="input-group">
+          <label><i class="fas fa-phone"></i> Mobile Number</label>
+          <input type="tel" id="signupPhone" placeholder="+91 9876543210" autocomplete="tel" maxlength="13">
         </div>
         <div class="input-group">
           <label><i class="fas fa-envelope"></i> Email</label>
@@ -2563,10 +2576,15 @@
         <button class="btn btn-full" onclick="signupUser()">
           <i class="fas fa-user-plus"></i> Create Account
         </button>
-        <div style="text-align:center;margin:15px 0;color:#999;">— ya —</div>
-<button class="btn btn-full" onclick="googleLogin()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);color:#00ffff;">
-  <i class="fab fa-google"></i> Google se Signup karo
-</button>
+        <div style="display:flex;align-items:center;gap:10px;margin:18px 0;">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
+          <span style="color:#999;font-size:13px;">ya</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
+        </div>
+        <button class="btn btn-full" onclick="googleLogin()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);color:#00ffff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" style="background:#fff;border-radius:50%;padding:2px;">
+          Continue with Google
+        </button>
         <p style="text-align: center; margin-top: 15px; color: #999;">
           Already have an account? <span style="color: #00ffff; cursor: pointer; font-weight: bold;" onclick="switchToLogin()">Login</span>
         </p>
@@ -2613,7 +2631,8 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';    import { getDatabase, ref, set, get, push, onValue, remove, update, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+    import { getDatabase, ref, set, get, push, onValue, remove, update, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
 
    const firebaseConfig = {
   apiKey: "AIzaSyBybXbMVsoPovDyKtOtfxE6DghVpSFTGHk",
@@ -2646,8 +2665,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
     window.authSignIn = signInWithEmailAndPassword;
     window.authSignOut = signOut;
     window.authUpdateProfile = updateProfile;
-    window.GoogleAuthProvider = GoogleAuthProvider;
-    window.signInWithPopup = signInWithPopup;
+
     window.currentUser = null;
     window.allProducts = [];
     window.currentProduct = null;
@@ -4386,28 +4404,6 @@ Once payment is completed, the download link for your purchased digital item (HT
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('signupForm').style.display = 'block';
     }
-    async function googleLogin() {
-  try {
-    showLoading('Google se login ho raha hai...');
-    const provider = new window.GoogleAuthProvider();
-    const result = await window.signInWithPopup(window.auth, provider);
-    const user = result.user;
-    await window.dbSet(window.dbRef(window.db, `users/${user.uid}/profile`), {
-      name: user.displayName || 'User',
-      email: user.email,
-      createdAt: new Date().toISOString()
-    });
-    hideLoading();
-    closeModal('authModal');
-    showNotification(`Welcome, ${user.displayName}!`, 'success');
-  } catch (error) {
-    hideLoading();
-    if (error.code !== 'auth/popup-closed-by-user') {
-      showNotification('Google login failed: ' + error.message, 'error');
-    }
-  }
-}
-window.googleLogin = googleLogin;
 
     function switchToLogin() {
       document.getElementById('authTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
@@ -4463,11 +4459,17 @@ window.googleLogin = googleLogin;
 
     async function signupUser() {
       const name = document.getElementById('signupName').value.trim();
+      const phone = document.getElementById('signupPhone').value.trim();
       const email = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
 
       if (!name || !email || !password) {
         showNotification('Please fill all fields', 'error');
+        return;
+      }
+
+      if (phone && !/^[\d\s\+\-\(\)]{10,13}$/.test(phone)) {
+        showNotification('Please enter a valid mobile number', 'error');
         return;
       }
 
@@ -4490,6 +4492,7 @@ window.googleLogin = googleLogin;
         await window.dbSet(window.dbRef(window.db, `users/${userCredential.user.uid}/profile`), {
           name: name,
           email: email,
+          phone: phone || 'N/A',
           createdAt: new Date().toISOString()
         });
         
@@ -4498,6 +4501,7 @@ window.googleLogin = googleLogin;
         closeModal('authModal');
         
         document.getElementById('signupName').value = '';
+        document.getElementById('signupPhone').value = '';
         document.getElementById('signupEmail').value = '';
         document.getElementById('signupPassword').value = '';
         
