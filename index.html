@@ -2531,23 +2531,50 @@
       <h2 class="modal-title" id="authTitle"><i class="fas fa-sign-in-alt"></i> Login</h2>
       
       <div id="loginForm">
-        <div class="input-group">
-          <label><i class="fas fa-envelope"></i> Email</label>
-          <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+        <div id="loginMethodTabs" style="display:flex;gap:10px;margin-bottom:18px;">
+          <button id="loginEmailTab" onclick="switchLoginMethod('email')" style="flex:1;padding:9px;border-radius:8px;border:1px solid #00ffff;background:linear-gradient(135deg,#00ffff,#a855f7);color:#000;font-weight:bold;cursor:pointer;font-size:13px;">
+            <i class="fas fa-envelope"></i> Email
+          </button>
+          <button id="loginPhoneTab" onclick="switchLoginMethod('phone')" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,255,255,0.3);background:rgba(255,255,255,0.05);color:#00ffff;font-weight:bold;cursor:pointer;font-size:13px;">
+            <i class="fas fa-phone"></i> Mobile
+          </button>
         </div>
-        <div class="input-group">
-          <label><i class="fas fa-lock"></i> Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+
+        <div id="loginEmailSection">
+          <div class="input-group">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+          </div>
+          <button class="btn btn-full" onclick="loginUser()">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
         </div>
-        <button class="btn btn-full" onclick="loginUser()">
-          <i class="fas fa-sign-in-alt"></i> Login
-        </button>
+
+        <div id="loginPhoneSection" style="display:none;">
+          <div class="input-group">
+            <label><i class="fas fa-phone"></i> Mobile Number</label>
+            <input type="tel" id="loginPhone" placeholder="+91 9876543210" autocomplete="tel" maxlength="13">
+          </div>
+          <div class="input-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="loginPhonePassword" placeholder="Enter password" autocomplete="current-password">
+          </div>
+          <div style="color:#999;font-size:12px;margin-bottom:12px;"><i class="fas fa-info-circle"></i> Mobile number se registered email se login hoga</div>
+          <button class="btn btn-full" onclick="loginWithPhone()">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </div>
+
         <div style="display:flex;align-items:center;gap:10px;margin:18px 0;">
           <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
           <span style="color:#999;font-size:13px;">ya</span>
           <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
         </div>
-        <button class="btn btn-full" onclick="googleLogin()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);color:#00ffff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;">
+        <button onclick="googleLogin()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);border-radius:10px;color:#00ffff;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.3s ease;" onmouseover="this.style.background='rgba(0,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" style="background:#fff;border-radius:50%;padding:2px;">
           Continue with Google
         </button>
@@ -2581,7 +2608,7 @@
           <span style="color:#999;font-size:13px;">ya</span>
           <div style="flex:1;height:1px;background:rgba(255,255,255,0.15);"></div>
         </div>
-        <button class="btn btn-full" onclick="googleLogin()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);color:#00ffff;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;">
+        <button onclick="googleLogin()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,255,255,0.3);border-radius:10px;color:#00ffff;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.3s ease;" onmouseover="this.style.background='rgba(0,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" style="background:#fff;border-radius:50%;padding:2px;">
           Continue with Google
         </button>
@@ -4410,6 +4437,93 @@ Once payment is completed, the download link for your purchased digital item (HT
       document.getElementById('signupForm').style.display = 'none';
       document.getElementById('loginForm').style.display = 'block';
     }
+
+    function switchLoginMethod(method) {
+      const emailSection = document.getElementById('loginEmailSection');
+      const phoneSection = document.getElementById('loginPhoneSection');
+      const emailTab = document.getElementById('loginEmailTab');
+      const phoneTab = document.getElementById('loginPhoneTab');
+      if (method === 'email') {
+        emailSection.style.display = 'block';
+        phoneSection.style.display = 'none';
+        emailTab.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid #00ffff;background:linear-gradient(135deg,#00ffff,#a855f7);color:#000;font-weight:bold;cursor:pointer;font-size:13px;';
+        phoneTab.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,255,255,0.3);background:rgba(255,255,255,0.05);color:#00ffff;font-weight:bold;cursor:pointer;font-size:13px;';
+      } else {
+        emailSection.style.display = 'none';
+        phoneSection.style.display = 'block';
+        phoneTab.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid #00ffff;background:linear-gradient(135deg,#00ffff,#a855f7);color:#000;font-weight:bold;cursor:pointer;font-size:13px;';
+        emailTab.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,255,255,0.3);background:rgba(255,255,255,0.05);color:#00ffff;font-weight:bold;cursor:pointer;font-size:13px;';
+      }
+    }
+
+    async function googleLogin() {
+      try {
+        showLoading('Google se login ho raha hai...');
+        const provider = new window.GoogleAuthProvider();
+        const result = await window.signInWithPopup(window.auth, provider);
+        const user = result.user;
+        await window.dbSet(window.dbRef(window.db, `users/${user.uid}/profile`), {
+          name: user.displayName || 'User',
+          email: user.email,
+          phone: 'N/A',
+          createdAt: new Date().toISOString()
+        });
+        hideLoading();
+        closeModal('authModal');
+        showNotification(`Welcome, ${user.displayName}!`, 'success');
+      } catch (error) {
+        hideLoading();
+        if (error.code !== 'auth/popup-closed-by-user') {
+          showNotification('Google login failed: ' + error.message, 'error');
+        }
+      }
+    }
+    window.googleLogin = googleLogin;
+
+    async function loginWithPhone() {
+      const phone = document.getElementById('loginPhone').value.trim();
+      const password = document.getElementById('loginPhonePassword').value.trim();
+      if (!phone || !password) {
+        showNotification('Mobile number aur password daalo', 'error');
+        return;
+      }
+      try {
+        showLoading('Users dhundh rahe hain...');
+        const usersSnap = await window.dbGet(window.dbRef(window.db, 'users'));
+        hideLoading();
+        if (!usersSnap.exists()) {
+          showNotification('Koi user nahi mila is number se', 'error');
+          return;
+        }
+        let foundEmail = null;
+        const users = usersSnap.val();
+        for (const uid in users) {
+          const profile = users[uid]?.profile;
+          if (profile && profile.phone === phone) {
+            foundEmail = profile.email;
+            break;
+          }
+        }
+        if (!foundEmail) {
+          showNotification('Is mobile number se koi account nahi mila', 'error');
+          return;
+        }
+        showLoading('Login ho raha hai...');
+        await window.authSignIn(window.auth, foundEmail, password);
+        hideLoading();
+        closeModal('authModal');
+        showNotification('Login successful!', 'success');
+      } catch (error) {
+        hideLoading();
+        let msg = 'Login failed';
+        if (error.code === 'auth/wrong-password') msg = 'Password galat hai';
+        else if (error.code === 'auth/too-many-requests') msg = 'Bahut zyada attempts, thodi der baad try karo';
+        else msg = error.message;
+        showNotification(msg, 'error');
+      }
+    }
+    window.loginWithPhone = loginWithPhone;
+    window.switchLoginMethod = switchLoginMethod;
 
     async function loginUser() {
       const email = document.getElementById('loginEmail').value.trim();
