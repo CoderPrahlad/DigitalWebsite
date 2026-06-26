@@ -1491,7 +1491,6 @@ async function updateStats() {
     let activeCoupons=0;
     if(cs.exists()){ const now=Date.now(); activeCoupons=Object.values(cs.val()).filter(c=>c.isActive&&(!c.expiryDate||new Date(c.expiryDate).getTime()>now)).length; }
     document.getElementById('dashTotalCoupons').textContent=activeCoupons;
-    if(adminS.exists()&&adminS.val().adminPassword) document.getElementById('adminPasswordDisplay').textContent=adminS.val().adminPassword;
   } catch(e){ console.error('Error updating stats:',e); }
 }
 
