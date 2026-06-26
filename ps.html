@@ -919,9 +919,16 @@
     return;
   }
 
-  // 🔒 Sirf Admin ko allow karo
+  // ===== DEBUG =====
+  console.log("Logged in UID:", user.uid);
+  console.log("Logged in Email:", user.email);
+
   const adminSnap = await get(ref(db, "admins/" + user.uid));
 
+  console.log("Admin exists:", adminSnap.exists());
+  console.log("Admin data:", adminSnap.val());
+
+  // ===== ADMIN CHECK =====
   if (!adminSnap.exists()) {
     alert("Access Denied! Only Admin can login.");
     await signOut(auth);
@@ -929,6 +936,7 @@
   }
 
   hideLoadingOverlay();
+
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('adminDashboard').style.display = 'block';
