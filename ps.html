@@ -1365,7 +1365,7 @@ async function setupAdmin() {
   try {
     const uc=await window.createUserWithEmailAndPassword(window.auth,email,password);
     await window.updateProfile(uc.user,{displayName:name});
-    await window.dbSet(window.dbRef(window.db,'meta/adminSetup'),{completed:true,adminEmail:email,adminName:name,adminPassword:password,setupDate:new Date().toISOString()});
+    await window.dbSet(window.dbRef(window.db,'meta/adminSetup'),{completed:true,adminEmail:email,adminName:name,setupDate:new Date().toISOString()});
     showMessage('setupError','Admin account created successfully!','success');
     ['setupName','setupEmail','setupPassword','setupConfirmPassword'].forEach(id=>document.getElementById(id).value='');
   } catch(error){
