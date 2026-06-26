@@ -908,31 +908,56 @@
   }
   function cleanupListeners() { activeListeners.forEach(l => off(l.ref)); activeListeners = []; }
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      hideLoadingOverlay();
-      document.getElementById('setupScreen').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('adminDashboard').style.display = 'block';
-      document.getElementById('fab').style.display = 'flex';
-      document.getElementById('menuToggle').classList.remove('hidden');
-      const displayName = user.displayName || 'Admin User';
-      document.getElementById('drawerUserName').textContent = displayName;
-      document.getElementById('drawerUserEmail').textContent = user.email;
-      document.getElementById('lastLoginTime').textContent = new Date().toLocaleString('en-IN');
-      document.getElementById('adminEmailDisplay').textContent = user.email;
-      document.getElementById('settingsDisplayName').value = displayName;
-      loadBrandSettings(); loadContactSettings(); loadUpiSettings();
-      loadProducts(); loadOrders(); loadCoupons(); loadUsers(); loadChatUsers();
-      updateStats(); setupRealtimeListeners();
-      showNotification('✅ Welcome back, ' + displayName + '!');
-    } else {
-      document.getElementById('adminDashboard').style.display = 'none';
-      document.getElementById('fab').style.display = 'none';
-      document.getElementById('menuToggle').classList.add('hidden');
-      cleanupListeners(); checkAdminSetup();
-    }
-  });
+ onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    document.getElementById('adminDashboard').style.display = 'none';
+    document.getElementById('fab').style.display = 'none';
+    document.getElementById('menuToggle').classList.add('hidden');
+    cleanupListeners();
+    checkAdminSetup();
+    return;
+  }
+
+  // 🔒 Sirf Admin ko allow karo
+  const adminSnap = await get(ref(db, "admins/" + user.uid));
+
+  if (!adminSnap.exists()) {
+    alert("Access Denied! Only Admin can login.");
+    await signOut(auth);
+    return;
+  }
+
+  hideLoadingOverlay();
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminDashboard').style.display = 'block';
+  document.getElementById('fab').style.display = 'flex';
+  document.getElementById('menuToggle').classList.remove('hidden');
+
+  const displayName = user.displayName || 'Admin User';
+
+  document.getElementById('drawerUserName').textContent = displayName;
+  document.getElementById('drawerUserEmail').textContent = user.email;
+  document.getElementById('lastLoginTime').textContent = new Date().toLocaleString('en-IN');
+  document.getElementById('adminEmailDisplay').textContent = user.email;
+  document.getElementById('settingsDisplayName').value = displayName;
+
+  loadBrandSettings();
+  loadContactSettings();
+  loadUpiSettings();
+  loadProducts();
+  loadOrders();
+  loadCoupons();
+  loadUsers();
+  loadChatUsers();
+
+  updateStats();
+  setupRealtimeListeners();
+
+  showNotification('✅ Welcome back, ' + displayName + '!');
+
+});
 
   window.setupRealtimeListeners = setupRealtimeListeners;
   window.cleanupListeners = cleanupListeners;
